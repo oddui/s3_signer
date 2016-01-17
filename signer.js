@@ -5,16 +5,16 @@ var _ = require('lodash');
 
 var s3 = new AWS.S3(config);
 
-module.exports.putUrl = putUrl;
+module.exports.putObject = putObject;
 
-function putUrl(params, fn) {
+function putObject(params, fn) {
   s3.getSignedUrl('putObject', _.extend({
     Key: uuid.v1(),
     Expires: 60
   }, params), fn);
 }
 
-/*putUrl({
+/*putObject({
   Bucket: 'durarara-chat-assets',
   ContentType: 'text'
 }, function(err, url) {

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var signer = require('../signer');
 var uuid = require('node-uuid');
+var _ = require('lodash');
 
 module.exports = router;
 
@@ -13,7 +14,7 @@ router.get('/sign', [paramsCheck, sign]);
 function paramsCheck(req, res, next) {
   var query = req.query;
 
-  if (query.operation && query.bucket && query.contentType) {
+  if (query.Operation && query.Bucket && query.ContentType) {
     next();
   } else {
     var err = new Error('Bad parameters.');
@@ -23,15 +24,13 @@ function paramsCheck(req, res, next) {
 }
 
 function sign(req, res, next) {
-  switch(req.query.operation) {
+  switch(req.query.Operation) {
     case 'putObject':
-      var params = {
-        Bucket: req.query.bucket,
-        ContentType: req.query.contentType
-      }
-      // set Key if keyPrefix is defined
-      if (req.query.keyPrefix) {
-        params.Key = req.query.keyPrefix + uuid.v1();
+      var params = _.pick(req.query, ['Bucket', 'ContentType', 'CacheControl']);
+
+      // set Key if KeyPrefix is defined
+      if (req.query.KeyPrefix) {
+        params.Key = req.query.KeyPrefix + uuid.v1();
       }
 
       signer.putObject(params, function(err, url) {
